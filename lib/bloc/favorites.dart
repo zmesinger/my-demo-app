@@ -23,49 +23,38 @@ class _FavoritesState extends State<Favorites> {
   @override
   Widget build(BuildContext context) {
 
-    return BlocBuilder<WordPairBloc, WordPairState>(
-      builder: (context, state) {
-        Iterable<ListTile> tiles;
-        if(state is StateFetchingData){
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("Saved suggestions"),
-            ),
-            body: Center(
-                child:
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircularProgressIndicator(color: Colors.red,),
-                  ],
-                )),
-          );
-        }else if(state is StateDataFetched) {
-          tiles = state.data.map(
-                (pair) {
-              return ListTile(
-                title: Text(
-                  pair.asPascalCase,
-                ),
-              );
-            },
-          );
-        }else{
-          return Container();
-        }
 
-        final divided = tiles.isNotEmpty
-            ? ListTile.divideTiles(
-          context: context,
-          tiles: tiles,
-        ).toList() : <Widget>[];
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text("Saved suggestions"),
-          ),
-          body: ListView(children: divided),
-        );
-      },
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Saved suggestions"),
+      ),
+      body: BlocBuilder<WordPairBloc, WordPairState>(
+        builder: (context, state) {
+
+          if(state is StateFetchingData){
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(color: Colors.red,),
+                ],
+              ),
+            );
+          }else if(state is StateDataFetched){
+            Iterable<ListTile> tiles;
+            tiles = state.data.map((pair) =>
+            ListTile(title: Text(pair.asPascalCase),));
+            final divided = tiles.isNotEmpty
+                ? ListTile.divideTiles(
+              context: context,
+              tiles: tiles,
+            ).toList() : <Widget>[];
+            return ListView(children: divided);
+          }else{
+            return Container();
+          }
+        },
+      ),
     );
   }
 

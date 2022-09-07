@@ -71,19 +71,29 @@ class _RandomWordsState extends State<RandomWords> {
           }
 
           return BlocBuilder<WordPairBloc, WordPairState>(
+            buildWhen: (prev, curr) {
+              return curr is StateWordPairToggled || curr is WordPairInitial;
+            },
             builder: (context, state) {
               print("Recieved state: ${state}");
               if (state is StateWordPairToggled) print(
                   "Recieved set: ${state.savedData}");
               final bool alreadySaved = state is StateWordPairToggled &&
-                  state.savedData.contains(_suggestions[index]);
+                  state.savedData.contains(_suggestions[index]) || state is StateDataFetched &&
+                  state.data.contains(_suggestions[index]);
               return ListTile(
                 title: Text(
                   _suggestions[index].asPascalCase,
                   style: _biggerFont,
                 ),
                 trailing: Icon(
-                  alreadySaved ? Icons.favorite : Icons.favorite_border,
+                  (){
+                    if(alreadySaved){
+                      return Icons.favorite;
+                    } else {
+                      return Icons.favorite_border;
+                    }
+                  }(),
                   color: alreadySaved ? Colors.red : null,
                   semanticLabel: alreadySaved ? "Remove from saved" : "Save",
                 ),
